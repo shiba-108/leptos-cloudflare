@@ -1,6 +1,7 @@
 pub mod contact;
 mod d1;
 pub mod games;
+pub mod search;
 pub mod state;
 pub mod todos;
 

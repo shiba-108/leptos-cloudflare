@@ -40,6 +40,7 @@ enum RouteFamily {
     LabDetail,
     About,
     Contact,
+    Search,
     NotFound,
 }
 
@@ -53,6 +54,7 @@ enum ServerFunction {
     ToggleTodo,
     DeleteTodo,
     GetTodo,
+    SearchPublicContent,
     SubmitContact,
     Unknown,
 }
@@ -163,6 +165,7 @@ fn classify_route(path: &str) -> RouteFamily {
         "/lab" => RouteFamily::Lab,
         "/about" => RouteFamily::About,
         "/contact" => RouteFamily::Contact,
+        "/vi/search" => RouteFamily::Search,
         _ if has_single_path_parameter(normalized, "/lab/")
             || has_single_path_parameter(normalized, "/todo/") =>
         {
@@ -189,6 +192,7 @@ fn classify_server_function(path: &str) -> ServerFunction {
         "/api/toggle_todo" => ServerFunction::ToggleTodo,
         "/api/delete_todo" => ServerFunction::DeleteTodo,
         "/api/get_todo" => ServerFunction::GetTodo,
+        "/api/search_public_content" => ServerFunction::SearchPublicContent,
         "/api/submit_contact" => ServerFunction::SubmitContact,
         _ => ServerFunction::Unknown,
     }
@@ -249,6 +253,14 @@ mod tests {
             "create_todo"
         );
         assert_eq!(
+            event_for("/vi/search", "GET", Some(200))["route_family"],
+            "search"
+        );
+        assert_eq!(
+            event_for("/api/search_public_content", "GET", Some(200))["server_function"],
+            "search_public_content"
+        );
+        assert_eq!(
             event_for("/api/private-value", "DELETE", Some(405))["server_function"],
             "unknown"
         );
@@ -269,6 +281,7 @@ mod tests {
             "toggle_todo",
             "delete_todo",
             "get_todo",
+            "search_public_content",
             "submit_contact",
         ] {
             let path = format!("/api/{name}13596420688598566242");

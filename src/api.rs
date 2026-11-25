@@ -6,6 +6,7 @@ use crate::components::home_page::ProductSummary;
 use crate::contact::ContactSubmissionInput;
 
 pub use crate::contact_fields::ContactResponse;
+pub use crate::search::SearchOutcome;
 pub use crate::todos::{normalize_todo_title, TodoItem, TodoUpdateOutcome, TodosResponse};
 use leptos::server_fn::{
     codec::{GetUrl, Json},
@@ -17,6 +18,22 @@ pub async fn get_public_games() -> Result<Vec<ProductSummary>, ServerFnError> {
     #[cfg(feature = "ssr")]
     {
         crate::server::run(crate::server::games::get_public_games()).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(
+    name = SearchPublicContent,
+    endpoint = "search_public_content",
+    protocol = Http<GetUrl, Json>
+)]
+pub async fn search_public_content(query: String) -> Result<SearchOutcome, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::search::search_public_content(query)).await
     }
     #[cfg(not(feature = "ssr"))]
     {

@@ -11,6 +11,7 @@ mod contact;
 mod contact_fields;
 #[cfg(any(feature = "ssr", test))]
 mod edge;
+mod search;
 #[cfg(feature = "ssr")]
 mod server;
 #[cfg(any(feature = "ssr", test))]
