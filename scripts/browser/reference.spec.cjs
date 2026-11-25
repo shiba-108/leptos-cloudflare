@@ -69,7 +69,7 @@ test('keyboard entry exposes the skip link and visible focus', async ({ page }) 
   expect(focusStyle.outlineWidth).not.toBe('0px');
 
   await page.keyboard.press('Alt+Tab');
-  await expect(page.getByRole('link', { name: 'Leptos CF home' })).toBeFocused();
+  await expect(page.getByRole('link', { name: 'VionSky home' })).toBeFocused();
 });
 
 test('D1 task records remain isolated between browser sessions', async ({ browser }) => {
