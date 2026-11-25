@@ -7,6 +7,10 @@ use crate::contact::ContactSubmissionInput;
 
 pub use crate::contact_fields::ContactResponse;
 pub use crate::todos::{normalize_todo_title, TodoItem, TodoUpdateOutcome, TodosResponse};
+use leptos::server_fn::{
+    codec::{GetUrl, Json},
+    Http,
+};
 
 #[server(name = GetPublicGames, endpoint = "get_public_games")]
 pub async fn get_public_games() -> Result<Vec<ProductSummary>, ServerFnError> {
@@ -116,6 +120,29 @@ pub async fn get_todo(id: i64) -> Result<TodoItem, ServerFnError> {
         crate::server::run(crate::server::todos::get_todo(id)).await
     }
 
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(
+    name = GetCommunityDetail,
+    endpoint = "community_detail",
+    protocol = Http<GetUrl, Json>
+)]
+pub async fn get_community_detail(
+    raw_id: String,
+    comment_page: u32,
+) -> Result<crate::community::CommunityDetailResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::community::fetch_community_detail(
+            &raw_id,
+            comment_page,
+        ))
+        .await
+    }
     #[cfg(not(feature = "ssr"))]
     {
         unreachable!("server functions only execute on the server")
