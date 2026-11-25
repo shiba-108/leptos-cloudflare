@@ -8,11 +8,13 @@ use leptos_router::{
 use crate::components::about_page::AboutPage;
 use crate::components::app_layout::AppLayout;
 use crate::components::architecture_page::ArchitecturePage;
+use crate::components::community_detail_page::CommunityDetailPage;
 use crate::components::contact_page::ContactPage;
 use crate::components::home_page::HomePage;
 use crate::components::patterns_page::PatternsPage;
 use crate::components::resource_explorer::{ResourceDetailPage, ResourceExplorerPage};
 use crate::components::start_page::StartPage;
+use crate::components::static_pages::{AboutViPage, ContactViPage, PrivacyViPage, TermsViPage};
 use crate::components::todo_detail_page::TodoDetailPage;
 use crate::components::todo_page::TodoPage;
 
@@ -32,6 +34,7 @@ pub fn App() -> impl IntoView {
             <AppLayout>
                 <Routes fallback=|| view! { <NotFoundPage/> }.into_view()>
                     <Route path=StaticSegment("") view=HomePage ssr=SsrMode::OutOfOrder/>
+                    <Route path=StaticSegment("vi") view=HomePage ssr=SsrMode::OutOfOrder/>
                     <Route path=StaticSegment("start") view=StartPage ssr=SsrMode::OutOfOrder/>
                     <Route path=StaticSegment("architecture") view=ArchitecturePage ssr=SsrMode::OutOfOrder/>
                     <Route path=StaticSegment("patterns") view=PatternsPage ssr=SsrMode::OutOfOrder/>
@@ -41,6 +44,11 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("lab") view=TodoPage ssr=SsrMode::OutOfOrder/>
                     <Route path=StaticSegment("about") view=AboutPage ssr=SsrMode::OutOfOrder/>
                     <Route path=StaticSegment("contact") view=ContactPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("about")) view=AboutViPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("terms")) view=TermsViPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("privacy")) view=PrivacyViPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("contact")) view=ContactViPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("community"), ParamSegment("id")) view=CommunityDetailPage ssr=SsrMode::OutOfOrder/>
 
                     <Route
                         path=(StaticSegment("lab"), ParamSegment("id"))
