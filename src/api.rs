@@ -1,10 +1,24 @@
 use leptos::prelude::*;
 
+use crate::components::home_page::ProductSummary;
+
 #[cfg(feature = "ssr")]
 use crate::contact::ContactSubmissionInput;
 
 pub use crate::contact_fields::ContactResponse;
 pub use crate::todos::{normalize_todo_title, TodoItem, TodoUpdateOutcome, TodosResponse};
+
+#[server(name = GetPublicGames, endpoint = "get_public_games")]
+pub async fn get_public_games() -> Result<Vec<ProductSummary>, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::games::get_public_games()).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
 
 #[server(name = SearchTodos, endpoint = "search_todos")]
 pub async fn search_todos(query: String, status: String) -> Result<TodosResponse, ServerFnError> {
