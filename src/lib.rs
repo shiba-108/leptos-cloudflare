@@ -4,6 +4,7 @@ mod api;
 mod app;
 #[cfg(feature = "ssr")]
 mod asset_hashes;
+mod community;
 mod components;
 #[cfg(any(feature = "ssr", test))]
 mod contact;
