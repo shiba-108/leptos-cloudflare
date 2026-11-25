@@ -13,7 +13,6 @@ pub fn AppLayout(children: Children) -> impl IntoView {
                     <SkyMark />
                     <span class="site-brand__name">"VionSky"</span>
                 </A>
-
                 <nav class="site-nav" aria-label="Điều hướng chính">
                     <A href="/vi/" attr:class="site-nav__link">"Khám phá"</A>
                     <A href="/vi/about" attr:class="site-nav__link">"Giới thiệu"</A>
