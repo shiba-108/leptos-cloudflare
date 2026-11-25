@@ -30,6 +30,14 @@ pub(crate) async fn dispatch(
     ctx: worker::Context,
 ) -> worker::Result<web_sys::Response> {
     let url = req.url()?;
+    if url.path() == "/robots.txt" && url.host_str().is_some_and(route::is_staging_host) {
+        return Ok(worker::ResponseBuilder::new()
+            .with_status(200)
+            .with_header("Content-Type", "text/plain; charset=utf-8")?
+            .with_header("X-Robots-Tag", "noindex, nofollow")?
+            .ok("User-agent: *\nDisallow: /\nSitemap: https://vionsky.com/sitemap.xml\n")?
+            .into());
+    }
     let upgrade = req.headers().get("Upgrade")?;
     let route = with_manifest(|manifest| {
         route::decide(

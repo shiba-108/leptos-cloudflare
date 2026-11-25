@@ -343,7 +343,7 @@ def check_text_resource(report: Report, response: Response, label: str) -> None:
         report.check(False, f"{label} body", f"response is not UTF-8: {error}")
 
 
-def check_robots(report: Report, response: Response) -> None:
+def check_robots(report: Report, response: Response, stage_host: str) -> None:
     check_text_resource(report, response, "robots.txt")
     if response.status != 200:
         return
@@ -366,6 +366,8 @@ def check_robots(report: Report, response: Response) -> None:
         "robots.txt sitemap",
         f"expected {EXPECTED_SITEMAP!r} directive; found {sitemap_urls!r}",
     )
+    disallow_all = any(name == "disallow" and value == "/" for name, value in directives)
+    report.check(disallow_all, "staging robots disallow", f"{stage_host} must contain Disallow: /")
 
 
 def check_llms(report: Report, response: Response) -> None:
@@ -396,7 +398,7 @@ def run(origin: str, stage_host: str) -> int:
 
     robots = get_checked(report, origin, "/robots.txt", "robots.txt")
     if robots is not None:
-        check_robots(report, robots)
+        check_robots(report, robots, stage_host)
 
     llms = get_checked(report, origin, "/llms.txt", "llms.txt")
     if llms is not None:

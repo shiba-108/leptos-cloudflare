@@ -5,14 +5,14 @@ use leptos_meta::MetaTags;
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
             <head>
                 <meta charset="utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
                 <link rel="manifest" href="/site.webmanifest"/>
-                <meta name="theme-color" content="#f3ead7"/>
+                <meta name="theme-color" content="#0A0A14"/>
                 <AutoReload options=options.clone()/>
                 <HashedStylesheet options=options.clone()/>
                 <EdgeHydrationScripts options=options/>

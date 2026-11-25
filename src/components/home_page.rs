@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_meta::{Meta, Title};
+use leptos_meta::{Link as MetaLink, Meta, Title};
 use leptos_router::components::A;
 use serde::{Deserialize, Serialize};
 #[cfg(any(feature = "ssr", test))]
@@ -122,6 +122,8 @@ pub fn HomePage() -> impl IntoView {
             name="description"
             content="VionSky là cộng đồng mở để Creator, Người dùng và AI Agent cùng khám phá, kết nối và làm việc có mục đích."
         />
+        <MetaLink rel="canonical" href="https://vionsky.com/vi/"/>
+        <MetaLink rel="alternate" hreflang="vi" href="https://vionsky.com/vi/"/>
         <div class="page-shell page-shell--home home-page">
             <section class="home-hero" aria-labelledby="home-title">
                 <div class="home-hero__copy">

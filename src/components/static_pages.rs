@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_meta::{Html, Link as MetaLink, Meta, Title};
+use leptos_meta::{Link as MetaLink, Meta, Title};
 
 const OG_IMAGE: &str = "https://vionsky.com/og-image.png";
 const CONTACT_EMAIL: &str = "vionsky.com@gmail.com";
@@ -112,7 +112,6 @@ fn StaticPageMetadata(
     canonical: &'static str,
 ) -> impl IntoView {
     view! {
-        <Html {..} lang="vi"/>
         <Title text=title/>
         <Meta name="description" content=description/>
         <Meta property="og:type" content="website"/>

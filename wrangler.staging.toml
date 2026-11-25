@@ -1,0 +1,24 @@
+name = "vionsky-leptos-staging"
+main = "build/_worker.js"
+compatibility_date = "2026-08-10"
+workers_dev = false
+
+[[routes]]
+pattern = "staging.vionsky.com/*"
+zone_name = "vionsky.com"
+
+[build]
+command = "bash ./scripts/build-edge.sh"
+
+[assets]
+directory = "./target/site"
+binding = "ASSETS"
+run_worker_first = ["/robots.txt"]
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1.0
+invocation_logs = true

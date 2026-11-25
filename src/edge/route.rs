@@ -78,6 +78,28 @@ pub(super) fn is_websocket_upgrade(upgrade: Option<&str>) -> bool {
     upgrade.is_some_and(|value| value.eq_ignore_ascii_case("websocket"))
 }
 
+pub(super) fn is_staging_host(host: &str) -> bool {
+    let host = host.trim_end_matches('.').to_ascii_lowercase();
+    if matches!(host.as_str(), "localhost" | "127.0.0.1" | "[::1]")
+        || host.ends_with(".localhost")
+        || host.ends_with(".workers.dev")
+        || host.ends_with(".pages.dev")
+    {
+        return true;
+    }
+
+    if matches!(host.as_str(), "vionsky.com" | "www.vionsky.com") {
+        return false;
+    }
+
+    host.split('.').any(|label| {
+        matches!(
+            label,
+            "qa" | "test" | "testing" | "dev" | "stage" | "staging" | "preview"
+        )
+    })
+}
+
 /// `pathname` is the URL path as parsed by the platform: dot segments are
 /// already resolved and escapes are still encoded.
 pub(super) fn decide(

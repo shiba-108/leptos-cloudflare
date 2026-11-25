@@ -1,7 +1,8 @@
 use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, Meta, Title};
+use leptos_meta::{provide_meta_context, Html, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
+    hooks::use_location,
     ParamSegment, SsrMode, StaticSegment, WildcardSegment,
 };
 
@@ -23,13 +24,8 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Title text="Leptos CF"/>
-        <Meta
-            name="description"
-            content="A source-derived field guide and full-stack Leptos starter for Cloudflare Workers."
-        />
-
         <Router>
+            <DocumentLocale/>
             // Keeping it inside Router gives the shared nav links their routing context.
             <AppLayout>
                 <Routes fallback=|| view! { <NotFoundPage/> }.into_view()>
@@ -45,6 +41,7 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("contact") view=ContactPage ssr=SsrMode::OutOfOrder/>
 
                     // VionSky public pages render content and metadata in the initial HTML.
+                    <Route path=(StaticSegment("vi"), StaticSegment("")) view=HomePage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("about")) view=AboutViPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("terms")) view=TermsViPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("privacy")) view=PrivacyViPage ssr=SsrMode::Async/>
@@ -76,6 +73,20 @@ pub fn App() -> impl IntoView {
             </AppLayout>
         </Router>
     }
+}
+
+#[component]
+fn DocumentLocale() -> impl IntoView {
+    let location = use_location();
+    let locale = move || {
+        if location.pathname.get().starts_with("/vi") {
+            "vi".to_owned()
+        } else {
+            "en".to_owned()
+        }
+    };
+
+    view! { <Html {..} lang=locale/> }
 }
 
 #[component]

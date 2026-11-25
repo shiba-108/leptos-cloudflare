@@ -7,6 +7,7 @@ pub(super) fn apply_response_headers(
     response: &mut axum::http::Response<axum::body::Body>,
     content_security_policy: &axum::http::header::HeaderValue,
     request_identity: &RequestIdentity,
+    is_staging: bool,
 ) -> worker::Result<()> {
     use axum::http::header::{
         HeaderValue, CACHE_CONTROL, REFERRER_POLICY, SET_COOKIE, X_CONTENT_TYPE_OPTIONS,
@@ -28,6 +29,12 @@ pub(super) fn apply_response_headers(
         HeaderName::from_static(X_FRAME_OPTIONS_HEADER),
         HeaderValue::from_static("DENY"),
     );
+    if is_staging {
+        headers.insert(
+            HeaderName::from_static("x-robots-tag"),
+            HeaderValue::from_static("noindex, nofollow"),
+        );
+    }
 
     if request_identity.set_cookie {
         headers.append(SET_COOKIE, session_cookie_header_value(request_identity)?);
@@ -41,7 +48,7 @@ pub(super) fn content_security_policy(
 ) -> worker::Result<axum::http::header::HeaderValue> {
     let script_sources = format!("'self' 'nonce-{nonce}' 'wasm-unsafe-eval'");
     let value = format!(
-        "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; script-src {script_sources};"
+        "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https://tutienky.top https://langlacviet.io.vn https://sangtao.ai https://lamtruyen.sunwolfstudio.com; connect-src 'self' ws: wss:; style-src 'self'; script-src {script_sources};"
     );
     axum::http::header::HeaderValue::from_str(&value)
         .map_err(|error| worker::Error::RustError(error.to_string()))

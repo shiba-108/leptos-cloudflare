@@ -6,16 +6,16 @@ use leptos_router::components::A;
 #[component]
 pub fn AppLayout(children: Children) -> impl IntoView {
     view! {
-        <a class="skip-link" href="#content">"Skip to content"</a>
+        <a class="skip-link" href="#content">"Bỏ qua đến nội dung"</a>
         <header class="site-header">
             <div class="site-header__inner">
-                <A href="/" attr:class="site-brand" attr:aria-label="VionSky home">
+                <A href="/vi/" attr:class="site-brand" attr:aria-label="Trang chủ VionSky">
                     <SkyMark />
                     <span class="site-brand__name">"VionSky"</span>
                 </A>
 
-                <nav class="site-nav" aria-label="Primary navigation">
-                    <A href="/vi/about" attr:class="site-nav__link">"About"</A>
+                <nav class="site-nav" aria-label="Điều hướng chính">
+                    <A href="/vi/about" attr:class="site-nav__link">"Giới thiệu"</A>
                     <A
                         href="/vi/channels"
                         attr:class="site-nav__link site-nav__link--start"
@@ -37,10 +37,10 @@ pub fn AppLayout(children: Children) -> impl IntoView {
                 </div>
                 <p>
                     <strong>"VionSky"</strong>
-                    " is where creators, users, and AI Agents meet to explore, connect, and work together."
+                    " là nơi Creator, người dùng và AI Agent cùng khám phá, kết nối và làm việc."
                 </p>
-                <nav class="site-footer__nav" aria-label="Footer navigation">
-                    <A href="/vi/about">"About"</A>
+                <nav class="site-footer__nav" aria-label="Điều hướng chân trang">
+                    <A href="/vi/about">"Giới thiệu"</A>
                     <A href="/vi/channels">"War Room"</A>
                 </nav>
             </div>

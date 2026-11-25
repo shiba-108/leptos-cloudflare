@@ -44,6 +44,7 @@ async fn handle(
         get_configuration(None).map_err(|error| worker::Error::RustError(error.to_string()))?;
     let leptos_options = conf.leptos_options;
     let request_identity = request_identity(&req)?;
+    let is_staging = req.uri().host().is_some_and(route::is_staging_host);
     let request_nonce = leptos::nonce::Nonce::new();
     let content_security_policy = content_security_policy(&request_nonce)?;
 
@@ -52,7 +53,12 @@ async fn handle(
             .status(rejection.status)
             .body(Body::from(rejection.message))
             .map_err(|error| worker::Error::RustError(error.to_string()))?;
-        apply_response_headers(&mut response, &content_security_policy, &request_identity)?;
+        apply_response_headers(
+            &mut response,
+            &content_security_policy,
+            &request_identity,
+            is_staging,
+        )?;
         return Ok(response);
     }
 
@@ -61,14 +67,24 @@ async fn handle(
             .status(StatusCode::PAYLOAD_TOO_LARGE)
             .body(Body::from("Request payload exceeds the demo limit."))
             .map_err(|error| worker::Error::RustError(error.to_string()))?;
-        apply_response_headers(&mut response, &content_security_policy, &request_identity)?;
+        apply_response_headers(
+            &mut response,
+            &content_security_policy,
+            &request_identity,
+            is_staging,
+        )?;
         return Ok(response);
     }
 
     let req = match body::bounded_api_request(req).await {
         Ok(req) => req,
         Err(mut response) => {
-            apply_response_headers(&mut response, &content_security_policy, &request_identity)?;
+            apply_response_headers(
+                &mut response,
+                &content_security_policy,
+                &request_identity,
+                is_staging,
+            )?;
             return Ok(response);
         }
     };
@@ -97,7 +113,12 @@ async fn handle(
         .with_state(state);
 
     let mut response = router.call(req).await?;
-    apply_response_headers(&mut response, &content_security_policy, &request_identity)?;
+    apply_response_headers(
+        &mut response,
+        &content_security_policy,
+        &request_identity,
+        is_staging,
+    )?;
 
     Ok(response)
 }

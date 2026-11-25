@@ -110,6 +110,22 @@ fn upgrade_detection_matches_the_header_value_exactly() {
 }
 
 #[test]
+fn staging_hosts_are_noindexed_but_production_is_not() {
+    for host in [
+        "staging.vionsky.com",
+        "qa.vionsky.com",
+        "leptos-cf.workers.dev",
+        "localhost",
+        "127.0.0.1",
+    ] {
+        assert!(is_staging_host(host), "{host}");
+    }
+    for host in ["vionsky.com", "www.vionsky.com", "vionsky.example.com"] {
+        assert!(!is_staging_host(host), "{host}");
+    }
+}
+
+#[test]
 fn pages_serves_only_inventoried_assets_outside_application_paths() {
     let pages = pages();
     assert_eq!(get("/logo.svg", &pages), Route::Asset);
