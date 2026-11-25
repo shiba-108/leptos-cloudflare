@@ -50,8 +50,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             noindex = "<meta name=\"robots\" content=\"noindex, nofollow\">"
             description = f'<meta name="description" content="{DESCRIPTION}">'
-            canonical = f'<link rel="canonical" href="{CANONICAL}">'
-            alternate = f'<link rel="alternate" hreflang="vi" href="{CANONICAL}">'
+            page_url = CANONICAL + "/" if mode == "trailing-canonical" else CANONICAL
+            canonical = f'<link rel="canonical" href="{page_url}">'
+            alternate = f'<link rel="alternate" hreflang="vi" href="{page_url}">'
             if mode == "bad-page":
                 noindex = ""
                 description = '<meta name="description" content="wrong">'
@@ -60,7 +61,7 @@ class Handler(BaseHTTPRequestHandler):
             jsonld = (
                 '{"@context":"https://schema.org","@type":"AboutPage",'
                 f'"name":"{TITLE}","description":"{DESCRIPTION}",'
-                f'"url":"{CANONICAL}","inLanguage":"vi"'
+                f'"url":"{page_url}","inLanguage":"vi"'
                 '}'
             )
             if mode == "bad-page":
@@ -88,12 +89,22 @@ class Handler(BaseHTTPRequestHandler):
             if mode == "bad-resources":
                 self.send(404, "not found", "text/plain")
             else:
-                self.send(200, "User-agent: *\nDisallow: /admin\nSitemap: https://vionsky.com/sitemap.xml\n", "text/plain; charset=utf-8")
+                body = (
+                    "Disallow: /admin\n"
+                    if mode == "bad-robots"
+                    else "User-agent: *\nDisallow: /admin\nSitemap: https://vionsky.com/sitemap.xml\n"
+                )
+                self.send(200, body, "text/plain; charset=utf-8")
         elif self.path == "/llms.txt":
             if mode == "bad-resources":
                 self.send(404, "not found", "text/plain")
             else:
-                self.send(200, "# VionSky\nCreators, users, and AI agents work together.\n", "text/plain; charset=utf-8")
+                body = (
+                    "VionSky\nCreators, users, and AI agents work together.\n"
+                    if mode == "bad-llms"
+                    else "# VionSky\nCreators, users, and AI agents work together.\n"
+                )
+                self.send(200, body, "text/plain; charset=utf-8")
         elif mode == "false-404":
             self.send(200, "<html><body>Not found</body></html>", "text/html")
         else:
@@ -136,6 +147,9 @@ class SeoQaTests(unittest.TestCase):
         for label in ("title", "description", "canonical", "hreflang", "JSON-LD", "sitemap.xml", "robots.txt", "llms.txt", "raw HTML", "real 404", "staging noindex"):
             self.assertIn(label, result.stdout)
         self.assertIn("does not prove SSG", result.stdout)
+        self.assertIn("Worker CPU budget", result.stdout)
+        for label in ("robots.txt user-agent", "robots.txt sitemap", "llms.txt heading"):
+            self.assertIn(f"[PASS] {label}", result.stdout)
         self.assertTrue(fixture.requests)
         self.assertTrue(all(method == "GET" for method, _path in fixture.requests))
 
@@ -144,6 +158,22 @@ class SeoQaTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         for label in ("description", "canonical", "hreflang", "JSON-LD", "staging noindex"):
             self.assertIn(f"[FAIL] {label}", result.stdout)
+
+    def test_about_canonical_trailing_slash_fails_exact_url_checks(self) -> None:
+        result = self.run_check("trailing-canonical")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        for label in ("canonical", "hreflang", "JSON-LD"):
+            self.assertIn(f"[FAIL] {label}", result.stdout)
+
+    def test_robots_directives_and_llms_heading_are_required(self) -> None:
+        result = self.run_check("bad-robots")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("[FAIL] robots.txt user-agent", result.stdout)
+        self.assertIn("[FAIL] robots.txt sitemap", result.stdout)
+
+        result = self.run_check("bad-llms")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("[FAIL] llms.txt heading", result.stdout)
 
     def test_missing_resources_and_styled_200_not_found_fail(self) -> None:
         result = self.run_check("bad-resources")

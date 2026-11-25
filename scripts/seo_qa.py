@@ -20,6 +20,7 @@ EXPECTED_DESCRIPTION = (
     "A sky full of ideas, the vibe never stops."
 )
 CANONICAL = "https://vionsky.com/vi/about"
+EXPECTED_SITEMAP = "https://vionsky.com/sitemap.xml"
 EXPECTED_H1 = "A sky full of ideas, the vibe never stops."
 RAW_CONTENT_MARKERS = (
     "VionSky không làm ra sản phẩm AI.",
@@ -60,8 +61,8 @@ class Report:
     def finish(self) -> int:
         print(f"Summary: {self.passed} passed, {self.failed} failed.")
         print(
-            "Evidence boundary: GET response checks only; raw HTML is inspected before hydration. "
-            "This does not prove SSG, browser behavior, or SEO parity."
+            "Evidence boundary: GET response checks only; raw initial HTTP HTML is inspected before hydration. "
+            "This does not prove SSG, browser/SEO parity, or Worker CPU budget."
         )
         return 1 if self.failed else 0
 
@@ -342,6 +343,47 @@ def check_text_resource(report: Report, response: Response, label: str) -> None:
         report.check(False, f"{label} body", f"response is not UTF-8: {error}")
 
 
+def check_robots(report: Report, response: Response) -> None:
+    check_text_resource(report, response, "robots.txt")
+    if response.status != 200:
+        return
+    try:
+        text = response.body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return
+    directives: list[tuple[str, str]] = []
+    for line in text.splitlines():
+        directive = line.partition("#")[0].strip()
+        if ":" not in directive:
+            continue
+        name, value = directive.split(":", 1)
+        directives.append((name.strip().casefold(), value.strip()))
+    user_agents = [value for name, value in directives if name == "user-agent" and value]
+    sitemap_urls = [value for name, value in directives if name == "sitemap" and value]
+    report.check(bool(user_agents), "robots.txt user-agent", "at least one non-empty User-agent directive is present")
+    report.check(
+        EXPECTED_SITEMAP in sitemap_urls,
+        "robots.txt sitemap",
+        f"expected {EXPECTED_SITEMAP!r} directive; found {sitemap_urls!r}",
+    )
+
+
+def check_llms(report: Report, response: Response) -> None:
+    check_text_resource(report, response, "llms.txt")
+    if response.status != 200:
+        return
+    try:
+        text = response.body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return
+    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    report.check(
+        first_line.startswith("# ") and bool(first_line[2:].strip()),
+        "llms.txt heading",
+        f"expected a non-empty Markdown H1 on the first non-empty line; found {first_line!r}",
+    )
+
+
 def run(origin: str, stage_host: str) -> int:
     report = Report()
     page = get_checked(report, origin, "/vi/about", "about page")
@@ -354,11 +396,11 @@ def run(origin: str, stage_host: str) -> int:
 
     robots = get_checked(report, origin, "/robots.txt", "robots.txt")
     if robots is not None:
-        check_text_resource(report, robots, "robots.txt")
+        check_robots(report, robots)
 
     llms = get_checked(report, origin, "/llms.txt", "llms.txt")
     if llms is not None:
-        check_text_resource(report, llms, "llms.txt")
+        check_llms(report, llms)
 
     missing_path = f"/.well-known/seo-qa-missing-{secrets.token_hex(8)}"
     try:
