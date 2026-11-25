@@ -1209,7 +1209,7 @@ button:disabled {
   .site-header__inner { min-height: 0; padding-block: var(--space-4); }
   .site-brand__note { display: none; }
   .site-nav { align-items: stretch; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .site-nav__link { border-bottom: 1px solid var(--rule-soft); min-height: 42px; }
+  .site-nav__link { border-bottom: 1px solid var(--rule-soft); min-height: 44px; }
   .site-nav__link--start { grid-column: 1 / -1; text-align: center; }
 
   .page-shell { padding-block: var(--space-8); }

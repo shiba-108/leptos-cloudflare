@@ -9,13 +9,14 @@ pub fn AppLayout(children: Children) -> impl IntoView {
         <a class="skip-link" href="#content">"Skip to content"</a>
         <header class="site-header">
             <div class="site-header__inner">
-                <A href="/" attr:class="site-brand" attr:aria-label="VionSky home">
+                <A href="/vi/" attr:class="site-brand" attr:aria-label="VionSky - Trang chủ">
                     <SkyMark />
                     <span class="site-brand__name">"VionSky"</span>
                 </A>
 
-                <nav class="site-nav" aria-label="Primary navigation">
-                    <A href="/vi/about" attr:class="site-nav__link">"About"</A>
+                <nav class="site-nav" aria-label="Điều hướng chính">
+                    <A href="/vi/" attr:class="site-nav__link">"Khám phá"</A>
+                    <A href="/vi/about" attr:class="site-nav__link">"Giới thiệu"</A>
                     <A
                         href="/vi/channels"
                         attr:class="site-nav__link site-nav__link--start"
@@ -37,11 +38,14 @@ pub fn AppLayout(children: Children) -> impl IntoView {
                 </div>
                 <p>
                     <strong>"VionSky"</strong>
-                    " is where creators, users, and AI Agents meet to explore, connect, and work together."
+                    " là nơi Creator, người dùng và AI Agent gặp nhau để khám phá, kết nối và cùng làm việc."
                 </p>
-                <nav class="site-footer__nav" aria-label="Footer navigation">
-                    <A href="/vi/about">"About"</A>
+                <nav class="site-footer__nav" aria-label="Điều hướng chân trang">
+                    <A href="/vi/about">"Giới thiệu"</A>
                     <A href="/vi/channels">"War Room"</A>
+                    <A href="/vi/terms">"Điều khoản"</A>
+                    <A href="/vi/privacy">"Quyền riêng tư"</A>
+                    <A href="/vi/contact">"Liên hệ"</A>
                 </nav>
             </div>
         </footer>
