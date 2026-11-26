@@ -4,7 +4,7 @@
 //! metadata inheritance.
 
 use leptos::prelude::*;
-use leptos_meta::{Html, Link as MetaLink, Meta, Title};
+use leptos_meta::{Link as MetaLink, Meta, Title};
 use serde_json::{json, Value};
 
 pub const BASE_URL: &str = "https://vionsky.com";
@@ -301,7 +301,15 @@ fn title_from_og(canonical: &str, _description: &str) -> String {
 
 /// Build the full, materialized tag set for one route.
 pub fn seo_view(meta: PageSeo) -> impl IntoView {
-    let alternates = locale_alternates(&meta.pathname, &meta.locale);
+    // `pathname` on PageSeo is already an absolute canonical URL. Derive the
+    // relative path again so hreflang URLs are not double-prefixed.
+    let prefix = format!("{BASE_URL}/{}/", meta.locale);
+    let relative_path = meta
+        .pathname
+        .strip_prefix(&prefix)
+        .map(|value| format!("/{value}"))
+        .unwrap_or_else(|| "/".to_string());
+    let alternates = locale_alternates(&relative_path, &meta.locale);
     let canonical = meta.pathname;
     let scripts = meta
         .json_ld
@@ -314,7 +322,6 @@ pub fn seo_view(meta: PageSeo) -> impl IntoView {
         .collect_view();
 
     view! {
-        <Html {..} lang=meta.locale.clone()/>
         <Title text=meta.title.clone()/>
         <Meta name="description" content=meta.description.clone()/>
         <Meta name="robots" content=meta.robots.clone()/>
