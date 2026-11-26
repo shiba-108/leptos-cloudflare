@@ -252,8 +252,8 @@ pub fn SiteHeader() -> impl IntoView {
                     <button
                         type="button"
                         class="site-nav__hamburger"
-                        attr:attr:aria-label="Menu"
-                        attr:attr:aria-expanded=move || drawer_open.get().to_string()
+                        attr:aria-label="Menu"
+                        attr:aria-expanded=move || drawer_open.get().to_string()
                         on:click=move |_| drawer_open.update(|open| *open = !*open)
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" attr:aria-hidden="true">
@@ -285,7 +285,7 @@ pub fn SiteHeader() -> impl IntoView {
         >
             <div class="site-nav__drawer-head">
                 <span class="site-brand__name">"VionSky"</span>
-                <button type="button" class="site-nav__close" autofocus attr:attr:aria-label="Đóng menu" on:click=move |_| drawer_open.set(false)>"✕"</button>
+                <button type="button" class="site-nav__close" autofocus attr:aria-label="Đóng menu" on:click=move |_| drawer_open.set(false)>"✕"</button>
             </div>
             <nav class="site-nav site-nav--drawer" attr:aria-label="Điều hướng chính">
                 <SiteNavLinks in_drawer=true/>
