@@ -1,7 +1,9 @@
+pub mod auth;
 pub mod contact;
 pub mod creator;
 mod d1;
 pub mod games;
+pub mod products;
 pub mod search;
 pub mod state;
 pub mod todos;

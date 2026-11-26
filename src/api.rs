@@ -5,8 +5,10 @@ use crate::components::home_page::ProductSummary;
 #[cfg(feature = "ssr")]
 use crate::contact::ContactSubmissionInput;
 
+pub use crate::auth::{AuthConfig, AuthResult};
 pub use crate::contact_fields::ContactResponse;
 pub use crate::creator::{CreatorGamesResult, FeedbackResult, MutationResult};
+pub use crate::product::ProductDetailResult;
 pub use crate::search::SearchOutcome;
 pub use crate::todos::{normalize_todo_title, TodoItem, TodoUpdateOutcome, TodosResponse};
 use leptos::server_fn::{
@@ -309,6 +311,70 @@ pub async fn handle_creator_feedback(
             id,
         ))
         .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = GetProductDetail, endpoint = "product_detail", protocol = Http<GetUrl, Json>)]
+pub async fn get_product_detail(slug: String) -> Result<ProductDetailResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::products::fetch_product_detail(&slug)).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = GetAuthConfig, endpoint = "auth_config")]
+pub async fn get_auth_config() -> Result<AuthConfig, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        let state = crate::server::AppState::from_context()?;
+        crate::server::run(async move { crate::server::auth::auth_config(&state) }).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = LeptosSignIn, endpoint = "leptos_sign_in")]
+pub async fn leptos_sign_in(email: String, password: String) -> Result<AuthResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        let state = crate::server::AppState::from_context()?;
+        crate::server::run(crate::server::auth::sign_in(&state, email, password)).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = LeptosSignOut, endpoint = "leptos_sign_out")]
+pub async fn leptos_sign_out(access_token: String) -> Result<AuthResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        let state = crate::server::AppState::from_context()?;
+        crate::server::run(crate::server::auth::sign_out(&state, access_token)).await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = LeptosRefreshSession, endpoint = "leptos_refresh_session")]
+pub async fn leptos_refresh_session(refresh_token: String) -> Result<AuthResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        let state = crate::server::AppState::from_context()?;
+        crate::server::run(crate::server::auth::refresh_session(&state, refresh_token)).await
     }
     #[cfg(not(feature = "ssr"))]
     {

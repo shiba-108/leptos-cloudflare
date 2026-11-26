@@ -1,7 +1,7 @@
 use crate::api::search_public_content;
 use crate::search::{SearchOutcome, SearchPost, SearchProduct, SearchResponse};
+use crate::seo::{search_seo, seo_view};
 use leptos::prelude::*;
-use leptos_meta::{Meta, Title};
 use leptos_router::{components::A, hooks::use_query_map};
 
 #[cfg(feature = "ssr")]
@@ -66,11 +66,7 @@ pub fn SearchPage() -> impl IntoView {
     );
 
     view! {
-        <Title text="Tìm kiếm sản phẩm và bài viết — VionSky" />
-        <Meta
-            name="description"
-            content="Tìm sản phẩm và bài viết trong cộng đồng VionSky."
-        />
+        {move || seo_view(search_seo("vi", &normalized_query()))}
         <div class="page-shell search-page">
             <header class="search-page__heading">
                 <p class="search-page__eyebrow">"Khám phá VionSky"</p>

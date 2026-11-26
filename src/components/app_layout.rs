@@ -1,3 +1,4 @@
+use crate::components::auth_page::AuthControls;
 use leptos::prelude::*;
 use leptos_router::components::A;
 
@@ -16,6 +17,7 @@ pub fn AppLayout(children: Children) -> impl IntoView {
                 <nav class="site-nav" aria-label="Điều hướng chính">
                     <A href="/vi/" attr:class="site-nav__link">"Khám phá"</A>
                     <A href="/vi/about" attr:class="site-nav__link">"Giới thiệu"</A>
+                    <AuthControls />
                     <A
                         href="/vi/channels"
                         attr:class="site-nav__link site-nav__link--start"

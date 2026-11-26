@@ -1,4 +1,6 @@
 @import url("./creator-dashboard.css");
+@import url("./product-detail.css");
+@import url("./auth.css");
 :root {
   --sky-bg: #0a0a14;
   --sky-surface: #151525;

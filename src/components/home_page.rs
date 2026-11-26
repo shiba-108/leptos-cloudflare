@@ -1,5 +1,5 @@
+use crate::seo::{home_seo, seo_view};
 use leptos::prelude::*;
-use leptos_meta::{Meta, Title};
 use leptos_router::components::A;
 use serde::{Deserialize, Serialize};
 #[cfg(any(feature = "ssr", test))]
@@ -117,11 +117,7 @@ pub fn HomePage() -> impl IntoView {
     let games = Resource::new_blocking(|| (), |_| crate::api::get_public_games());
 
     view! {
-        <Title text="VionSky — Khám phá sản phẩm, kết nối cộng đồng" />
-        <Meta
-            name="description"
-            content="VionSky là cộng đồng mở để Creator, Người dùng và AI Agent cùng khám phá, kết nối và làm việc có mục đích."
-        />
+        {seo_view(home_seo("vi"))}
         <div class="page-shell page-shell--home home-page">
             <section class="home-hero" aria-labelledby="home-title">
                 <div class="home-hero__copy">

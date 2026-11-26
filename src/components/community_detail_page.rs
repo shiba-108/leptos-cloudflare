@@ -1,5 +1,6 @@
 use crate::api::get_community_detail;
 use crate::community::{CommunityComment, CommunityDetailStatus};
+use crate::seo::{community_seo, seo_view};
 use leptos::prelude::*;
 use leptos_meta::{Meta, Title};
 use leptos_router::{components::A, hooks::use_params_map};
@@ -184,11 +185,14 @@ pub fn CommunityDetailPage() -> impl IntoView {
                             let post_comment_count = post.comment_count;
 
                             view! {
-                                <Title text=format!("{} — VionSky", post.title)/>
-                                <Meta name="description" content=description/>
-                                <Meta property="og:type" content="article"/>
-                                <Meta property="og:title" content=post.title.clone()/>
-                                <Meta property="og:description" content=meta_description(&post.content)/>
+                                {seo_view(community_seo(
+                                    &raw_id(),
+                                    &post.title,
+                                    &description,
+                                    &post.user_name,
+                                    &post.created_at,
+                                    post_comment_count as i64,
+                                ))}
 
                                 <article class="community-detail__post">
                                     <header class="community-detail__post-header">

@@ -8,11 +8,13 @@ use leptos_router::{
 use crate::components::about_page::AboutPage;
 use crate::components::app_layout::AppLayout;
 use crate::components::architecture_page::ArchitecturePage;
+use crate::components::auth_page::LoginPage;
 use crate::components::community_detail_page::CommunityDetailPage;
 use crate::components::contact_page::ContactPage;
 use crate::components::creator_dashboard_page::CreatorDashboardPage;
 use crate::components::home_page::HomePage;
 use crate::components::patterns_page::PatternsPage;
+use crate::components::product_detail_page::ProductDetailPage;
 use crate::components::resource_explorer::{ResourceDetailPage, ResourceExplorerPage};
 use crate::components::search_page::SearchPage;
 use crate::components::start_page::StartPage;
@@ -23,6 +25,7 @@ use crate::components::todo_page::TodoPage;
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
+    leptos::prelude::provide_context(RwSignal::new(crate::auth_client::stored_session()));
 
     view! {
         <Title text="Leptos CF"/>
@@ -53,6 +56,9 @@ pub fn App() -> impl IntoView {
                     <Route path=(StaticSegment("vi"), StaticSegment("search")) view=SearchPage ssr=SsrMode::Async/>
                     <Route path=StaticSegment("dashboard") view=CreatorDashboardPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("dashboard")) view=CreatorDashboardPage ssr=SsrMode::Async/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("login")) view=LoginPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("product"), ParamSegment("slug")) view=ProductDetailPage ssr=SsrMode::Async/>
+                    <Route path=(StaticSegment("product"), ParamSegment("slug")) view=ProductDetailPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("community"), ParamSegment("id")) view=CommunityDetailPage ssr=SsrMode::OutOfOrder/>
 
                     <Route

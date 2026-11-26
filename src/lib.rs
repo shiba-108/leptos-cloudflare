@@ -4,6 +4,8 @@ mod api;
 mod app;
 #[cfg(feature = "ssr")]
 mod asset_hashes;
+mod auth;
+mod auth_client;
 mod community;
 mod components;
 #[cfg(any(feature = "ssr", test))]
@@ -12,7 +14,9 @@ mod contact_fields;
 mod creator;
 #[cfg(any(feature = "ssr", test))]
 mod edge;
+mod product;
 mod search;
+mod seo;
 #[cfg(feature = "ssr")]
 mod server;
 #[cfg(any(feature = "ssr", test))]
