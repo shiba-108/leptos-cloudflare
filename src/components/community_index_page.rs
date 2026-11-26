@@ -93,6 +93,7 @@ pub fn CommunityIndexPage() -> impl IntoView {
                     </p>
                 </section>
 
+                <Suspense fallback=|| view! { <p class="home-status" role="status">"Đang tải cộng đồng…"</p> }>
                 <div class="feed-root">
                     <div class="feed-toolbar">
                         <span class="feed-count">
@@ -194,6 +195,7 @@ pub fn CommunityIndexPage() -> impl IntoView {
                         }.into_any(),
                     }}
                 </div>
+                </Suspense>
             </main>
         </div>
 
