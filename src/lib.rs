@@ -7,6 +7,7 @@ mod asset_hashes;
 mod auth;
 mod auth_client;
 mod community;
+mod community_index;
 mod components;
 #[cfg(any(feature = "ssr", test))]
 mod contact;
@@ -22,6 +23,7 @@ mod server;
 #[cfg(any(feature = "ssr", test))]
 mod telemetry;
 mod todos;
+mod visky;
 
 #[cfg(feature = "ssr")]
 #[worker::event(fetch)]

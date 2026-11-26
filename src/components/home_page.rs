@@ -1,5 +1,8 @@
+use crate::api::search_public_content;
+use crate::search::SearchOutcome;
 use crate::seo::{home_seo, seo_view};
 use leptos::prelude::*;
+use leptos::task::spawn_local;
 use leptos_router::components::A;
 use serde::{Deserialize, Serialize};
 #[cfg(any(feature = "ssr", test))]
@@ -112,8 +115,107 @@ fn ProductCard(game: ProductSummary) -> impl IntoView {
     }
 }
 
+const TASK_TRIALS: [(&str, &str, &[&str]); 3] = [
+    (
+        "puzzle",
+        "🧩 Game giải đố nhẹ nhàng",
+        &["puzzle", "relaxing", "nhan"],
+    ),
+    (
+        "shooter",
+        "🔫 Thử thách bắn súng AI",
+        &["shooter", "action"],
+    ),
+    ("rpg", "📖 Game nhập vai / Tu tiên", &["rpg", "tien"]),
+];
+
+/// Three task cards that resolve to the first non-empty search result,
+/// mirroring the Next.js TaskTrials island (d95287c:28-58).
+#[component]
+fn TaskTrials(
+    task_slugs: RwSignal<Option<Vec<String>>>,
+    task_label: RwSignal<Option<String>>,
+) -> impl IntoView {
+    let busy = RwSignal::new(false);
+
+    let run = move |title: &'static str, queries: &'static [&'static str]| {
+        if busy.get_untracked() {
+            return;
+        }
+        busy.set(true);
+        spawn_local(async move {
+            let mut slugs: Vec<String> = Vec::new();
+            for query in queries {
+                if let Ok(SearchOutcome::Loaded(response)) =
+                    search_public_content((*query).to_string()).await
+                {
+                    let found: Vec<String> = response
+                        .games
+                        .into_iter()
+                        .map(|game| game.slug)
+                        .filter(|slug| !slug.is_empty())
+                        .take(10)
+                        .collect();
+                    if !found.is_empty() {
+                        slugs = found;
+                        break;
+                    }
+                }
+            }
+            task_slugs.set(Some(slugs));
+            task_label.set(Some(title.to_owned()));
+            busy.set(false);
+        });
+    };
+
+    let clear = move |_| {
+        task_slugs.set(None);
+        task_label.set(None);
+    };
+
+    view! {
+        <section class="task-trials" aria-labelledby="task-trials-title">
+            <div class="task-trials__heading">
+                <p class="task-trials__eyebrow">"Task Trials"</p>
+                <h2 id="task-trials-title">"Bạn muốn tìm game gì hôm nay?"</h2>
+                <p>"Chọn việc bạn muốn làm — VionSky tìm game phù hợp."</p>
+            </div>
+            <div class="task-trials__grid">
+                {TASK_TRIALS.iter().map(|(id, title, queries)| {
+                    let id = *id;
+                    let title = *title;
+                    let queries = *queries;
+                    view! {
+                        <button
+                            type="button"
+                            class="task-trial-card"
+                            disabled=move || busy.get()
+                            on:click=move |_| run(title, queries)
+                        >
+                            <span class="task-trial-card__icon" aria-hidden="true">{id}</span>
+                            <span class="task-trial-card__body">
+                                <strong>{move || if busy.get() { "Đang tìm…" } else { title }}</strong>
+                                <span class="task-trial-card__cta">"Tìm ngay →"</span>
+                            </span>
+                        </button>
+                    }
+                }).collect_view()}
+            </div>
+            {move || task_slugs.get().map(|slugs| view! {
+                <div class="task-trials__active" role="status">
+                    <span>{move || format!("Đang lọc theo: {}", task_label.get().unwrap_or_default())}</span>
+                    <span>{move || format!("{} gợi ý", slugs.len())}</span>
+                    <button type="button" on:click=clear>"Xem tất cả"</button>
+                </div>
+            })}
+        </section>
+    }
+}
+
 #[component]
 pub fn HomePage() -> impl IntoView {
+    let task_slugs = RwSignal::new(None::<Vec<String>>);
+    let task_label = RwSignal::new(None::<String>);
     let games = Resource::new_blocking(|| (), |_| crate::api::get_public_games());
 
     view! {
@@ -148,6 +250,8 @@ pub fn HomePage() -> impl IntoView {
                 </figure>
             </section>
 
+            <TaskTrials task_slugs=task_slugs task_label=task_label />
+
             <section class="home-catalog" id="san-pham" aria-labelledby="home-catalog-title">
                 <header class="home-section-heading">
                     <div>
@@ -162,20 +266,35 @@ pub fn HomePage() -> impl IntoView {
                     <p class="home-status" role="status">"Đang tải danh sách sản phẩm…"</p>
                 }>
                     {move || games.map(|result| match result {
-                        Ok(items) if items.is_empty() => view! {
-                            <div class="home-empty">
-                                <h3>"Chưa có sản phẩm nào để khám phá"</h3>
-                                <p>"Danh sách đang trống. Bạn có thể quay lại sau hoặc chia sẻ sản phẩm của mình."</p>
-                                <A href="/vi/submit/" attr:class="home-text-link">"Chia sẻ sản phẩm"</A>
-                            </div>
-                        }.into_any(),
-                        Ok(items) => view! {
-                            <div class="home-product-grid">
-                                {items.iter().take(HOME_GAME_LIMIT).cloned().map(|game| view! {
-                                    <ProductCard game=game />
-                                }).collect_view()}
-                            </div>
-                        }.into_any(),
+                        Ok(items) => {
+                            let filter = task_slugs.get();
+                            let visible: Vec<_> = items
+                                .into_iter()
+                                .filter(|game| {
+                                    filter.as_ref().map_or(true, |slugs| slugs.contains(&game.slug))
+                                })
+                                .take(HOME_GAME_LIMIT)
+                                .collect();
+                            if visible.is_empty() {
+                                view! {
+                                    <div class="home-empty">
+                                        <h3>"Không tìm thấy game phù hợp với gợi ý này."</h3>
+                                        <button type="button" class="home-retry"
+                                            on:click=move |_| { task_slugs.set(None); task_label.set(None); }>
+                                            "Xem tất cả"
+                                        </button>
+                                    </div>
+                                }.into_any()
+                            } else {
+                                view! {
+                                    <div class="home-product-grid">
+                                        {visible.into_iter().map(|game| view! {
+                                            <ProductCard game=game.clone() />
+                                        }).collect_view()}
+                                    </div>
+                                }.into_any()
+                            }
+                        }
                         Err(_) => view! {
                             <div class="home-load-error" role="status">
                                 <div>

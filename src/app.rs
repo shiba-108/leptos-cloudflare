@@ -10,6 +10,7 @@ use crate::components::app_layout::AppLayout;
 use crate::components::architecture_page::ArchitecturePage;
 use crate::components::auth_page::LoginPage;
 use crate::components::community_detail_page::CommunityDetailPage;
+use crate::components::community_index_page::CommunityIndexPage;
 use crate::components::contact_page::ContactPage;
 use crate::components::creator_dashboard_page::CreatorDashboardPage;
 use crate::components::home_page::HomePage;
@@ -17,6 +18,7 @@ use crate::components::patterns_page::PatternsPage;
 use crate::components::product_detail_page::ProductDetailPage;
 use crate::components::resource_explorer::{ResourceDetailPage, ResourceExplorerPage};
 use crate::components::search_page::SearchPage;
+use crate::components::site_chrome::provide_admin_signal;
 use crate::components::start_page::StartPage;
 use crate::components::static_pages::{AboutViPage, ContactViPage, PrivacyViPage, TermsViPage};
 use crate::components::todo_detail_page::TodoDetailPage;
@@ -26,6 +28,7 @@ use crate::components::todo_page::TodoPage;
 pub fn App() -> impl IntoView {
     provide_meta_context();
     leptos::prelude::provide_context(RwSignal::new(crate::auth_client::stored_session()));
+    provide_admin_signal();
 
     view! {
         <Title text="Leptos CF"/>
@@ -59,6 +62,8 @@ pub fn App() -> impl IntoView {
                     <Route path=(StaticSegment("vi"), StaticSegment("login")) view=LoginPage ssr=SsrMode::OutOfOrder/>
                     <Route path=(StaticSegment("vi"), StaticSegment("product"), ParamSegment("slug")) view=ProductDetailPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("product"), ParamSegment("slug")) view=ProductDetailPage ssr=SsrMode::Async/>
+                    <Route path=StaticSegment("community") view=CommunityIndexPage ssr=SsrMode::OutOfOrder/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("community")) view=CommunityIndexPage ssr=SsrMode::OutOfOrder/>
                     <Route path=(StaticSegment("vi"), StaticSegment("community"), ParamSegment("id")) view=CommunityDetailPage ssr=SsrMode::OutOfOrder/>
 
                     <Route

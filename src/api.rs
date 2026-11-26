@@ -169,6 +169,70 @@ pub async fn get_community_detail(
     }
 }
 
+#[server(name = GetCommunityIndex, endpoint = "community_index", protocol = Http<GetUrl, Json>)]
+pub async fn get_community_index(
+    page: u32,
+    limit: u32,
+    category: Option<String>,
+    feed: String,
+) -> Result<crate::community_index::CommunityIndexResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::community_index::fetch_community_index(
+            page, limit, category, feed,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = CreateCommunityPost, endpoint = "community_post_create")]
+pub async fn create_community_post(
+    title: String,
+    content: String,
+    category: String,
+    game_id: Option<i64>,
+) -> Result<crate::community_index::CreatePostResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::community_index::create_community_post(
+            crate::community_index::CreatePostInput {
+                title,
+                content,
+                category,
+                game_id,
+            },
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = ViskyChat, endpoint = "visky_chat")]
+pub async fn visky_chat(
+    message: String,
+    session_id: Option<String>,
+    history: Vec<crate::visky::ChatTurn>,
+) -> Result<crate::visky::ViskyChatReply, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::visky::visky_chat(
+            message, session_id, history,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
 #[server(SubmitContact)]
 pub async fn submit_contact(
     name: String,

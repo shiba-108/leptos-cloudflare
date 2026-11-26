@@ -1,4 +1,5 @@
-use crate::components::auth_page::AuthControls;
+use crate::components::site_chrome::SiteHeader;
+use crate::components::visky_widget::ViskyWidget;
 use leptos::prelude::*;
 use leptos_router::components::A;
 
@@ -7,26 +8,7 @@ use leptos_router::components::A;
 #[component]
 pub fn AppLayout(children: Children) -> impl IntoView {
     view! {
-        <a class="skip-link" href="#content">"Skip to content"</a>
-        <header class="site-header">
-            <div class="site-header__inner">
-                <A href="/vi/" attr:class="site-brand" attr:aria-label="VionSky - Trang chủ">
-                    <SkyMark />
-                    <span class="site-brand__name">"VionSky"</span>
-                </A>
-                <nav class="site-nav" aria-label="Điều hướng chính">
-                    <A href="/vi/" attr:class="site-nav__link">"Khám phá"</A>
-                    <A href="/vi/about" attr:class="site-nav__link">"Giới thiệu"</A>
-                    <AuthControls />
-                    <A
-                        href="/vi/channels"
-                        attr:class="site-nav__link site-nav__link--start"
-                    >
-                        "War Room"
-                    </A>
-                </nav>
-            </div>
-        </header>
+        <SiteHeader />
 
         <main id="content" class="site-main">
             {children()}
@@ -50,6 +32,8 @@ pub fn AppLayout(children: Children) -> impl IntoView {
                 </nav>
             </div>
         </footer>
+
+        <ViskyWidget />
     }
 }
 

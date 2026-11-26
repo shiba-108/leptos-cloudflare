@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod community_index;
 pub mod contact;
 pub mod creator;
 mod d1;
@@ -7,6 +8,7 @@ pub mod products;
 pub mod search;
 pub mod state;
 pub mod todos;
+pub mod visky;
 
 pub use state::AppState;
 

@@ -410,6 +410,26 @@ pub fn community_seo(
         ))
 }
 
+pub fn community_index_seo(locale: &str) -> PageSeo {
+    let (title, description) = if locale == "en" {
+        (
+            "Community — AI Creativity Forum",
+            "Join the VIONSKY community to discuss AI-made games, tools, web apps and art. Share ideas, showcase products, ask questions and give feedback with other creators.",
+        )
+    } else {
+        (
+            "Cộng đồng — Diễn đàn AI Sáng tạo",
+            "Tham gia cộng đồng VIONSKY để thảo luận về game, tool, web app và art do AI tạo. Chia sẻ ý tưởng, khoe sản phẩm, hỏi đáp và góp ý cùng các nhà sáng tạo khác.",
+        )
+    };
+    PageSeo::new(locale, "/community", title, description).with_json_ld(web_page_json_ld(
+        "/community",
+        locale,
+        title,
+        description,
+    ))
+}
+
 pub fn product_seo(
     slug: &str,
     locale: &str,
