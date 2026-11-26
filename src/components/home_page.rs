@@ -1,8 +1,5 @@
-use crate::api::search_public_content;
-use crate::search::SearchOutcome;
 use crate::seo::{home_seo, seo_view};
 use leptos::prelude::*;
-use leptos::task::spawn_local;
 use leptos_router::components::A;
 use serde::{Deserialize, Serialize};
 #[cfg(any(feature = "ssr", test))]
@@ -115,64 +112,21 @@ fn ProductCard(game: ProductSummary) -> impl IntoView {
     }
 }
 
-const TASK_TRIALS: [(&str, &str, &[&str]); 3] = [
-    (
-        "puzzle",
-        "🧩 Game giải đố nhẹ nhàng",
-        &["puzzle", "relaxing", "nhan"],
-    ),
-    (
-        "shooter",
-        "🔫 Thử thách bắn súng AI",
-        &["shooter", "action"],
-    ),
-    ("rpg", "📖 Game nhập vai / Tu tiên", &["rpg", "tien"]),
+const TASK_TRIALS: [(&str, &str, &str); 3] = [
+    ("puzzle", "🧩 Game giải đố nhẹ nhàng", "puzzle"),
+    ("shooter", "🔫 Thử thách bắn súng AI", "shooter"),
+    ("rpg", "📖 Game nhập vai / Tu tiên", "rpg"),
 ];
 
-/// Three task cards that resolve to the first non-empty search result,
-/// mirroring the Next.js TaskTrials island (d95287c:28-58).
+/// Three task cards. Each opens the existing Leptos search page with the
+/// Task-Trials query, which calls the public `/api/search` via a server
+/// function and renders the matching products.
 #[component]
 fn TaskTrials(
     task_slugs: RwSignal<Option<Vec<String>>>,
     task_label: RwSignal<Option<String>>,
 ) -> impl IntoView {
-    let busy = RwSignal::new(false);
-
-    let run = move |title: &'static str, queries: &'static [&'static str]| {
-        if busy.get_untracked() {
-            return;
-        }
-        busy.set(true);
-        spawn_local(async move {
-            let mut slugs: Vec<String> = Vec::new();
-            for query in queries {
-                if let Ok(SearchOutcome::Loaded(response)) =
-                    search_public_content((*query).to_string()).await
-                {
-                    let found: Vec<String> = response
-                        .games
-                        .into_iter()
-                        .map(|game| game.slug)
-                        .filter(|slug| !slug.is_empty())
-                        .take(10)
-                        .collect();
-                    if !found.is_empty() {
-                        slugs = found;
-                        break;
-                    }
-                }
-            }
-            task_slugs.set(Some(slugs));
-            task_label.set(Some(title.to_owned()));
-            busy.set(false);
-        });
-    };
-
-    let clear = move |_| {
-        task_slugs.set(None);
-        task_label.set(None);
-    };
-
+    let _ = (task_slugs, task_label);
     view! {
         <section class="task-trials" aria-labelledby="task-trials-title">
             <div class="task-trials__heading">
@@ -181,33 +135,19 @@ fn TaskTrials(
                 <p>"Chọn việc bạn muốn làm — VionSky tìm game phù hợp."</p>
             </div>
             <div class="task-trials__grid">
-                {TASK_TRIALS.iter().map(|(id, title, queries)| {
-                    let id = *id;
-                    let title = *title;
-                    let queries = *queries;
+                {TASK_TRIALS.iter().map(|(id, title, query)| {
+                    let href = format!("/vi/search/?q={query}");
                     view! {
-                        <button
-                            type="button"
-                            class="task-trial-card"
-                            disabled=move || busy.get()
-                            on:click=move |_| run(title, queries)
-                        >
-                            <span class="task-trial-card__icon" aria-hidden="true">{id}</span>
+                        <A href=href attr:class="task-trial-card">
+                            <span class="task-trial-card__icon" aria-hidden="true">{*id}</span>
                             <span class="task-trial-card__body">
-                                <strong>{move || if busy.get() { "Đang tìm…" } else { title }}</strong>
+                                <strong>{*title}</strong>
                                 <span class="task-trial-card__cta">"Tìm ngay →"</span>
                             </span>
-                        </button>
+                        </A>
                     }
                 }).collect_view()}
             </div>
-            {move || task_slugs.get().map(|slugs| view! {
-                <div class="task-trials__active" role="status">
-                    <span>{move || format!("Đang lọc theo: {}", task_label.get().unwrap_or_default())}</span>
-                    <span>{move || format!("{} gợi ý", slugs.len())}</span>
-                    <button type="button" on:click=clear>"Xem tất cả"</button>
-                </div>
-            })}
         </section>
     }
 }

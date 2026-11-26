@@ -218,12 +218,14 @@ pub async fn create_community_post(
 pub async fn visky_chat(
     message: String,
     session_id: Option<String>,
-    history: Vec<crate::visky::ChatTurn>,
+    history_json: String,
 ) -> Result<crate::visky::ViskyChatReply, ServerFnError> {
     #[cfg(feature = "ssr")]
     {
         crate::server::run(crate::server::visky::visky_chat(
-            message, session_id, history,
+            message,
+            session_id,
+            history_json,
         ))
         .await
     }

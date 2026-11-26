@@ -27,9 +27,12 @@ struct OutboundBody {
 pub async fn visky_chat(
     message: String,
     session_id: Option<String>,
-    history: Vec<ChatTurn>,
+    history_json: String,
 ) -> AppResult<ViskyChatReply> {
     validate_chat_input(&message).map_err(AppError::client)?;
+    // Encoded as a JSON string so the server-fn PostUrl codec never has to
+    // serialize a sequence of structs (which it cannot represent).
+    let history: Vec<ChatTurn> = serde_json::from_str(&history_json).unwrap_or_default();
 
     // Client history is untrusted (`chat/route.ts:62-87`): allowlist roles,
     // cap item count and truncate each turn without breaking emoji graphemes.

@@ -75,7 +75,8 @@ pub fn ViskyWidget() -> impl IntoView {
         input.set(String::new());
         error.set(None);
         busy.set(true);
-        let history = build_history(&turns.get(), MAX_HISTORY_ROUNDS);
+        let history = serde_json::to_string(&build_history(&turns.get(), MAX_HISTORY_ROUNDS))
+            .unwrap_or_else(|_| "[]".to_string());
         turns.update(|items| {
             items.push(ChatTurn {
                 role: "user".to_owned(),
