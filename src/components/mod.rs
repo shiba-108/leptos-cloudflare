@@ -3,6 +3,7 @@ pub mod app_layout;
 pub mod architecture_page;
 pub mod community_detail_page;
 pub mod contact_page;
+pub mod creator_dashboard_page;
 pub mod home_page;
 pub mod patterns_page;
 pub mod resource_explorer;

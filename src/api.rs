@@ -6,6 +6,7 @@ use crate::components::home_page::ProductSummary;
 use crate::contact::ContactSubmissionInput;
 
 pub use crate::contact_fields::ContactResponse;
+pub use crate::creator::{CreatorGamesResult, FeedbackResult, MutationResult};
 pub use crate::search::SearchOutcome;
 pub use crate::todos::{normalize_todo_title, TodoItem, TodoUpdateOutcome, TodosResponse};
 use leptos::server_fn::{
@@ -188,6 +189,127 @@ pub async fn submit_contact(
         .await
     }
 
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = GetCreatorGames, endpoint = "get_creator_games")]
+pub async fn get_creator_games() -> Result<CreatorGamesResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::fetch_creator_games(
+            &crate::server::AppState::from_context()?,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = PatchCreatorGame, endpoint = "patch_creator_game")]
+pub async fn patch_creator_game(
+    game_id: i64,
+    description: String,
+    play_url: String,
+) -> Result<MutationResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::patch_creator_game(
+            &crate::server::AppState::from_context()?,
+            game_id,
+            description,
+            play_url,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = PostCreatorReAudit, endpoint = "post_creator_re_audit")]
+pub async fn post_creator_re_audit(game_id: i64) -> Result<MutationResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::post_re_audit(
+            &crate::server::AppState::from_context()?,
+            game_id,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = GetCreatorFeedback, endpoint = "get_creator_feedback")]
+pub async fn get_creator_feedback() -> Result<FeedbackResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::fetch_creator_feedback(
+            &crate::server::AppState::from_context()?,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = GetFeedbackSettings, endpoint = "get_feedback_settings")]
+pub async fn get_feedback_settings() -> Result<bool, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::fetch_feedback_settings(
+            &crate::server::AppState::from_context()?,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = PatchFeedbackSettings, endpoint = "patch_feedback_settings")]
+pub async fn patch_feedback_settings(
+    notify_feedback: bool,
+) -> Result<MutationResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::patch_feedback_settings(
+            &crate::server::AppState::from_context()?,
+            notify_feedback,
+        ))
+        .await
+    }
+    #[cfg(not(feature = "ssr"))]
+    {
+        unreachable!("server functions only execute on the server")
+    }
+}
+
+#[server(name = HandleCreatorFeedback, endpoint = "handle_creator_feedback")]
+pub async fn handle_creator_feedback(
+    kind: String,
+    id: i64,
+) -> Result<MutationResult, ServerFnError> {
+    #[cfg(feature = "ssr")]
+    {
+        crate::server::run(crate::server::creator::post_handle_feedback(
+            &crate::server::AppState::from_context()?,
+            kind,
+            id,
+        ))
+        .await
+    }
     #[cfg(not(feature = "ssr"))]
     {
         unreachable!("server functions only execute on the server")

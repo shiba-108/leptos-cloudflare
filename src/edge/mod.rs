@@ -74,11 +74,25 @@ async fn handle(
     };
 
     let routes = generate_route_list(crate::app::App);
+    // Forward only the two headers the authenticated upstream contract needs.
+    // They stay on the server side and never reach rendered HTML.
+    let forwarded_cookie = req
+        .headers()
+        .get("cookie")
+        .and_then(|v| v.to_str().ok())
+        .map(str::to_owned);
+    let forwarded_auth = req
+        .headers()
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .map(str::to_owned);
     let state = crate::server::AppState::new(
         leptos_options.clone(),
         env,
         request_identity.session_id.clone(),
         request_identity.client_ip.clone(),
+        forwarded_cookie,
+        forwarded_auth,
     );
 
     let mut router = Router::new()

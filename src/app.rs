@@ -10,6 +10,7 @@ use crate::components::app_layout::AppLayout;
 use crate::components::architecture_page::ArchitecturePage;
 use crate::components::community_detail_page::CommunityDetailPage;
 use crate::components::contact_page::ContactPage;
+use crate::components::creator_dashboard_page::CreatorDashboardPage;
 use crate::components::home_page::HomePage;
 use crate::components::patterns_page::PatternsPage;
 use crate::components::resource_explorer::{ResourceDetailPage, ResourceExplorerPage};
@@ -50,6 +51,8 @@ pub fn App() -> impl IntoView {
                     <Route path=(StaticSegment("vi"), StaticSegment("privacy")) view=PrivacyViPage ssr=SsrMode::OutOfOrder/>
                     <Route path=(StaticSegment("vi"), StaticSegment("contact")) view=ContactViPage ssr=SsrMode::OutOfOrder/>
                     <Route path=(StaticSegment("vi"), StaticSegment("search")) view=SearchPage ssr=SsrMode::Async/>
+                    <Route path=StaticSegment("dashboard") view=CreatorDashboardPage ssr=SsrMode::Async/>
+                    <Route path=(StaticSegment("vi"), StaticSegment("dashboard")) view=CreatorDashboardPage ssr=SsrMode::Async/>
                     <Route path=(StaticSegment("vi"), StaticSegment("community"), ParamSegment("id")) view=CommunityDetailPage ssr=SsrMode::OutOfOrder/>
 
                     <Route
