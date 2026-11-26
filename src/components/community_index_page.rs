@@ -111,20 +111,20 @@ pub fn CommunityIndexPage() -> impl IntoView {
                         </button>
                     </div>
 
-                    <div role="tablist" attr:aria-label="Chọn nguồn bài viết">
+                    <div role="tablist" aria-label="Chọn nguồn bài viết">
                         <button type="button" role="tab"
-                            attr:aria-selected=move || feed.get() == "latest"
+                            aria-selected=move || feed.get() == "latest"
                             on:click=move |_| choose_feed("latest")>"Mới nhất"</button>
                         <Show when=move || logged_in() fallback=|| ()>
                             <button type="button" role="tab"
-                                attr:aria-selected=move || feed.get() == "following"
+                                aria-selected=move || feed.get() == "following"
                                 on:click=move |_| choose_feed("following")>"Đang theo dõi"</button>
                         </Show>
                     </div>
 
-                    <div class="feed-tabs" role="tablist" attr:aria-label="Lọc theo chủ đề">
+                    <div class="feed-tabs" role="tablist" aria-label="Lọc theo chủ đề">
                         <button type="button" role="tab"
-                            attr:aria-selected=move || category.get().is_none()
+                            aria-selected=move || category.get().is_none()
                             on:click=move |_| choose_category(None)>Tất cả</button>
                         {CATEGORIES.into_iter().map(|value| {
                             let label = match value {
@@ -135,7 +135,7 @@ pub fn CommunityIndexPage() -> impl IntoView {
                             };
                             view! {
                                 <button type="button" role="tab"
-                                    attr:aria-selected=move || category.get().as_deref() == Some(value)
+                                    aria-selected=move || category.get().as_deref() == Some(value)
                                     on:click=move |_| choose_category(Some(value.to_string()))>
                                     {label}
                                 </button>
@@ -145,7 +145,7 @@ pub fn CommunityIndexPage() -> impl IntoView {
 
                     {move || match resource.get().and_then(|r| r.ok()) {
                         None => view! {
-                            <div role="status" attr:aria-busy="true">
+                            <div role="status" aria-busy="true">
                                 <span class="sr-only">"Đang tải"</span>
                                 {(0..3).map(|_| view! { <div class="feed-skeleton"></div> }).collect_view()}
                             </div>

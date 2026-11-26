@@ -129,7 +129,7 @@ pub fn LocaleToggle(#[prop(default = false)] compact: bool) -> impl IntoView {
         };
         view! {
             <A href=next_href attr:class="lang-toggle lang-toggle--compact" attr:aria-label=label>
-                <span class="lang-toggle__globe" attr:aria-hidden="true">"🌐"</span>
+                <span class="lang-toggle__globe" aria-hidden="true">"🌐"</span>
                 <span class="lang-toggle__code">{move || locale.get().code().to_uppercase()}</span>
             </A>
         }
@@ -139,10 +139,10 @@ pub fn LocaleToggle(#[prop(default = false)] compact: bool) -> impl IntoView {
         let vi_href = move || swap_locale_path(&location.pathname.get(), Locale::Vi);
         let en_href = move || swap_locale_path(&location.pathname.get(), Locale::En);
         view! {
-            <div class="lang-toggle" role="group" attr:aria-label="Ngôn ngữ">
-                <span class="lang-toggle__globe" attr:aria-hidden="true">"🌐"</span>
+            <div class="lang-toggle" role="group" aria-label="Ngôn ngữ">
+                <span class="lang-toggle__globe" aria-hidden="true">"🌐"</span>
                 <A href=vi_href attr:class="lang-toggle__option" attr:aria-pressed=move || (locale.get() == Locale::Vi).to_string() attr:aria-label="VI — Tiếng Việt">"VI"</A>
-                <span class="lang-toggle__sep" attr:aria-hidden="true">"/"</span>
+                <span class="lang-toggle__sep" aria-hidden="true">"/"</span>
                 <A href=en_href attr:class="lang-toggle__option" attr:aria-pressed=move || (locale.get() == Locale::En).to_string() attr:aria-label="EN — English">"EN"</A>
             </div>
         }.into_any()
@@ -183,7 +183,7 @@ fn SiteNavLinks(#[prop(default = false)] in_drawer: bool) -> impl IntoView {
 #[component]
 fn SkyMark() -> impl IntoView {
     view! {
-        <svg class="sky-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" attr:aria-hidden="true">
+        <svg class="sky-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M7 26C12 11 25 8 33 15M7 26C13 34 25 34 33 25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <circle class="sky-mark__node" cx="7" cy="26" r="3"/>
             <circle class="sky-mark__node" cx="20" cy="14" r="3"/>
@@ -237,7 +237,7 @@ pub fn SiteHeader() -> impl IntoView {
                     <SkyMark/>
                     <span class="site-brand__name">"VionSky"</span>
                 </A>
-                <nav class="site-nav site-nav--desktop" attr:aria-label="Điều hướng chính">
+                <nav class="site-nav site-nav--desktop" aria-label="Điều hướng chính">
                     <SiteNavLinks/>
                 </nav>
                 <div class="site-nav site-nav--actions">
@@ -252,11 +252,11 @@ pub fn SiteHeader() -> impl IntoView {
                     <button
                         type="button"
                         class="site-nav__hamburger"
-                        attr:aria-label="Menu"
-                        attr:aria-expanded=move || drawer_open.get().to_string()
+                        aria-label="Menu"
+                        aria-expanded=move || drawer_open.get().to_string()
                         on:click=move |_| drawer_open.update(|open| *open = !*open)
                     >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" attr:aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                             <path d="M3 6h18M3 12h18M3 18h18"/>
                         </svg>
                     </button>
@@ -273,21 +273,21 @@ pub fn SiteHeader() -> impl IntoView {
         </header>
 
         // ---- drawer: MobileDrawer; no portal needed in Leptos ----
-        <div class="site-nav__scrim" class:is-open=move || drawer_open.get() attr:aria-hidden="true" on:click=move |_| drawer_open.set(false)></div>
+        <div class="site-nav__scrim" class:is-open=move || drawer_open.get() aria-hidden="true" on:click=move |_| drawer_open.set(false)></div>
         <div
             class="site-nav__drawer"
             class:is-open=move || drawer_open.get()
             role="dialog"
-            attr:aria-modal="true"
-            attr:aria-label="Menu"
+            aria-modal="true"
+            aria-label="Menu"
             tabindex="-1"
             on:keydown=on_drawer_keydown
         >
             <div class="site-nav__drawer-head">
                 <span class="site-brand__name">"VionSky"</span>
-                <button type="button" class="site-nav__close" autofocus attr:aria-label="Đóng menu" on:click=move |_| drawer_open.set(false)>"✕"</button>
+                <button type="button" class="site-nav__close" autofocus aria-label="Đóng menu" on:click=move |_| drawer_open.set(false)>"✕"</button>
             </div>
-            <nav class="site-nav site-nav--drawer" attr:aria-label="Điều hướng chính">
+            <nav class="site-nav site-nav--drawer" aria-label="Điều hướng chính">
                 <SiteNavLinks in_drawer=true/>
                 <LocaleToggle/>
                 <AuthControls/>

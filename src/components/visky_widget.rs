@@ -114,22 +114,22 @@ pub fn ViskyWidget() -> impl IntoView {
         <button
             type="button"
             class="visky-fab"
-            attr:aria-expanded=move || open.get()
-            attr:aria-label="Mở Visky AI"
+            aria-expanded=move || open.get()
+            aria-label="Mở Visky AI"
             on:click=move |_| open.update(|value| *value = !*value)
         >
             "✦"
         </button>
 
         <Show when=move || open.get() fallback=|| ()>
-            <div class="visky-dialog" role="dialog" attr:aria-modal="true" attr:aria-label="Visky AI">
+            <div class="visky-dialog" role="dialog" aria-modal="true" aria-label="Visky AI">
                 <header class="visky-dialog__head">
                     <strong>"Visky AI"</strong>
-                    <button type="button" attr:aria-label="Đóng"
+                    <button type="button" aria-label="Đóng"
                         on:click=move |_| open.set(false)>"✕"</button>
                 </header>
 
-                <div class="visky-log" role="log" attr:aria-live="polite">
+                <div class="visky-log" role="log" aria-live="polite">
                     <Show when=move || turns.get().is_empty() && !busy.get() fallback=|| ()>
                         <p class="visky-empty">"Đặt câu hỏi để bắt đầu trò chuyện với Visky."</p>
                     </Show>
@@ -150,7 +150,7 @@ pub fn ViskyWidget() -> impl IntoView {
                     <input
                         maxlength="2000"
                         placeholder="Nhắn cho Visky…"
-                        attr:aria-label="Nhắn cho Visky"
+                        aria-label="Nhắn cho Visky"
                         prop:value=move || input.get()
                         on:input=move |event| input.set(leptos::tachys::dom::event_target_value(&event))
                     />
